@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_NOS 10001
+
+typedef struct no
+{
+		int valor;
+		struct no *prox;
+} no;
+
+no *adj[MAX_NOS];
+int visitado[MAX_NOS];
+int prof_max1, prof_max2;
+
+void adiciona_aresta(int u, int v)
+{
+		no *novo_no = (no *)malloc(sizeof(no));
+		novo_no->valor = v;
+		novo_no->prox = adj[u];
+		adj[u] = novo_no;
+}
+
+void dfs(int node, int prof) {
+		visitado[node] = 1;
+		if (prof > prof_max1) {
+				prof_max1 = prof;
+				prof_max2 = node;
+		}
+		for (no* vizinho = adj[node]; vizinho != NULL; vizinho = vizinho->prox) {
+				if (!visitado[vizinho->valor]) {
+						dfs(vizinho->valor, prof + 1);
+				}
+		}
+}
+int main()
+{
+		int qtd_nos;
+		scanf("%d", &qtd_nos);
+
+		for (int i = 1; i <= qtd_nos; i++)
+		{
+				adj[i] = NULL;
+				visitado[i] = 0;
+		}
+
+		for (int i = 0; i < qtd_nos - 1; i++)
+		{
+				int u, v;
+				scanf("%d %d", &u, &v);
+				adiciona_aresta(u, v);
+				adiciona_aresta(v, u);
+		}
+
+		prof_max1 = -1;
+		dfs(1, 0);
+
+		for (int i = 1; i <= qtd_nos; i++)
+				visitado[i] = 0;
+
+		prof_max1 = -1;
+		dfs(prof_max2, 0);
+
+		printf("%d\n", prof_max1);
+
+		return 0;
+}
